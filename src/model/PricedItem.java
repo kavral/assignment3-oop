@@ -1,5 +1,5 @@
 package model;
 
-public interface PricedUnit {
+public interface PricedItem {
     double getPrice();
 }

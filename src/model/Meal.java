@@ -1,6 +1,6 @@
 package model;
 
-public class Meal extends FoodUnit {
+public class Meal extends FoodItem {
 
     public Meal(int id, String name, double price) {
         super(id, name, price);

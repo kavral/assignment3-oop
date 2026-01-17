@@ -1,15 +1,21 @@
 import model.*;
+import service.FoodItemService;
+import exception.FoodItemNotValidException;
 
 public class Main {
     public static void main(String[] args) {
 
-        FoodUnit burger = new Meal(1, "Burger", 8.99);
-        FoodUnit cola = new Drink(2, "Cola", -2.0); // invalid price
+        FoodItemService service = new FoodItemService();
 
-        System.out.println(burger.getDescription());
-        System.out.println("Valid: " + burger.validate());
+        FoodItem pizza = new Meal(1, "Pizza", 10.5);
+        FoodItem badDrink = new Drink(2, "Cola", -3.0);
 
-        System.out.println(cola.getDescription());
-        System.out.println("Valid: " + cola.validate());
+        service.createFoodItem(pizza);
+
+        try {
+            service.createFoodItem(badDrink);
+        } catch (FoodItemNotValidException e) {
+            System.out.println("ERROR: " + e.getMessage());
+        }
     }
 }
