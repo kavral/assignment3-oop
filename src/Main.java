@@ -1,17 +1,15 @@
-import model.FoodUnit;
-import model.Meal;
-import model.Drink;
+import model.*;
 
 public class Main {
     public static void main(String[] args) {
 
-        FoodUnit item1 = new Meal(1, "Burger", 8.99);
-        FoodUnit item2 = new Drink(2, "Cola", 2.49);
+        FoodUnit burger = new Meal(1, "Burger", 8.99);
+        FoodUnit cola = new Drink(2, "Cola", -2.0); // invalid price
 
-        System.out.println(item1.getDescription());
-        System.out.println("Price: " + item1.calculatePrice());
+        System.out.println(burger.getDescription());
+        System.out.println("Valid: " + burger.validate());
 
-        System.out.println(item2.getDescription());
-        System.out.println("Price: " + item2.calculatePrice());
+        System.out.println(cola.getDescription());
+        System.out.println("Valid: " + cola.validate());
     }
 }

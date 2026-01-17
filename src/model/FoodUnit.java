@@ -1,6 +1,7 @@
 package model;
 
-public abstract class FoodUnit {
+public abstract class FoodUnit implements PricedUnit, Validatable {
+
     protected int id;
     protected String name;
     protected double price;
@@ -14,6 +15,16 @@ public abstract class FoodUnit {
     public abstract double calculatePrice();
     public abstract String getDescription();
 
+    @Override
+    public double getPrice() {
+        return price;
+    }
+
+    @Override
+    public boolean validate() {
+        return price > 0 && name != null && !name.isEmpty();
+    }
+
     public String basicInfo() {
         return name + " - $" + price;
     }
@@ -24,9 +35,5 @@ public abstract class FoodUnit {
 
     public String getName() {
         return name;
-    }
-
-    public double getPrice() {
-        return price;
     }
 }
