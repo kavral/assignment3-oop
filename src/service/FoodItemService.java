@@ -1,17 +1,34 @@
 package service;
 
 import model.FoodItem;
-import exception.FoodItemNotValidException;
+import repository.FoodItemRepository;
+
+import java.util.List;
 
 public class FoodItemService {
 
-    public void createFoodItem(FoodItem item) {
-        if (!item.validate()) {
-            throw new FoodItemNotValidException(
-                    "Food item validation failed: " + item.getName()
-            );
-        }
+    private final FoodItemRepository repository = new FoodItemRepository();
 
-        System.out.println("Food item created: " + item.basicInfo());
+    public void addFoodItem(FoodItem item) {
+        item.validate();
+        repository.save(item);
+    }
+
+    public List<FoodItem> getAllFoodItems() {
+        return repository.findAll();
+    }
+
+    public void updatePrice(String name, double price) {
+        if (price <= 0) {
+            throw new RuntimeException("Price must be positive");
+        }
+        repository.updatePrice(name, price);
+    }
+
+    public void deleteFoodItem(String name) {
+        if (name == null || name.isBlank()) {
+            throw new RuntimeException("Name cannot be empty");
+        }
+        repository.deleteByName(name);
     }
 }
