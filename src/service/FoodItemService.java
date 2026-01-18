@@ -9,9 +9,9 @@ public class FoodItemService {
 
     private final FoodItemRepository repository = new FoodItemRepository();
 
-    public void addFoodItem(FoodItem item) {
+    public int addFoodItem(FoodItem item) {
         item.validate();
-        repository.save(item);
+        return repository.save(item);
     }
 
     public List<FoodItem> getAllFoodItems() {
@@ -30,5 +30,16 @@ public class FoodItemService {
             throw new RuntimeException("Name cannot be empty");
         }
         repository.deleteByName(name);
+    }
+
+    public FoodItem getFoodItemById(int id) {
+        if (id <= 0) {
+            throw new RuntimeException("ID must be positive");
+        }
+        FoodItem item = repository.findById(id);
+        if (item == null) {
+            throw new RuntimeException("Food item not found with ID: " + id);
+        }
+        return item;
     }
 }

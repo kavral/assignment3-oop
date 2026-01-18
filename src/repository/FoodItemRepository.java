@@ -11,24 +11,33 @@ import java.util.List;
 
 public class FoodItemRepository {
 
-    public void save(FoodItem item) {
+    public int save(FoodItem item) {
         String sql =
                 "INSERT INTO food_items (name, price, type) VALUES (?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, item.getName());
             ps.setDouble(2, item.getPrice());
             ps.setString(3, item.getClass().getSimpleName());
 
-            ps.executeUpdate();
-
-            System.out.println("Saved: " + item.getName());
+            int affectedRows = ps.executeUpdate();
+            
+            if (affectedRows > 0) {
+                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        int id = generatedKeys.getInt(1);
+                        System.out.println("Saved: " + item.getName() + " (ID: " + id + ")");
+                        return id;
+                    }
+                }
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return -1;
     }
 
     public List<FoodItem> findAll() {
@@ -40,14 +49,15 @@ public class FoodItemRepository {
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
+                int id = rs.getInt("id");
                 String name = rs.getString("name");
                 double price = rs.getDouble("price");
                 String type = rs.getString("type");
 
                 FoodItem item =
                         type.equals("Meal")
-                                ? new Meal(0, name, price)
-                                : new Drink(0, name, price);
+                                ? new Meal(id, name, price)
+                                : new Drink(id, name, price);
 
                 items.add(item);
             }
@@ -86,5 +96,31 @@ public class FoodItemRepository {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public FoodItem findById(int id) {
+        String sql = "SELECT * FROM food_items WHERE id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                String name = rs.getString("name");
+                double price = rs.getDouble("price");
+                String type = rs.getString("type");
+
+                return type.equals("Meal")
+                        ? new Meal(id, name, price)
+                        : new Drink(id, name, price);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

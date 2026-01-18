@@ -55,9 +55,9 @@ public class FoodItemController {
         scanner.nextLine();
 
         FoodItem meal = new Meal(0, name, price);
-        service.addFoodItem(meal);
+        int id = service.addFoodItem(meal);
 
-        System.out.println("Meal added.");
+        System.out.println("Meal added with ID: " + id);
     }
 
     private void addDrink() {
@@ -69,9 +69,9 @@ public class FoodItemController {
         scanner.nextLine();
 
         FoodItem drink = new Drink(0, name, price);
-        service.addFoodItem(drink);
+        int id = service.addFoodItem(drink);
 
-        System.out.println("Drink added.");
+        System.out.println("Drink added with ID: " + id);
     }
 
     private void viewAll() {
@@ -79,7 +79,7 @@ public class FoodItemController {
 
         System.out.println("\n--- MENU ---");
         for (FoodItem item : items) {
-            System.out.println(item.getDescription() + " | $" + item.getPrice());
+            System.out.println("ID: " + item.getId() + " | " + item.getDescription() + " | $" + item.getPrice());
         }
     }
 
