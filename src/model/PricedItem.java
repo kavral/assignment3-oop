@@ -1,5 +1,5 @@
 package model;
 
-public interface PricedItem {
+public interface PricedItem extends Validatable {
     double getPrice();
 }
