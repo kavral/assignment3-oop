@@ -52,11 +52,9 @@ public abstract class FoodItem implements PricedItem, Validatable {
     protected String name;
     protected double price;
     
-    // Abstract methods (must be implemented by subclasses)
     public abstract double calculatePrice();
     public abstract String getDescription();
     
-    // Concrete methods
     public double getPrice() { return price; }
     public boolean validate() { return price > 0 && name != null && !name.isEmpty(); }
 }
