@@ -619,7 +619,7 @@ Meal added with ID: 1
 
 ## F. Screenshots Instructions
 
-screenshots
+[screenshots](https://github.com/kavral/assignment3-oop/tree/57c7d1a6baa64d252ccd79fec04eadd228783e4a/screenshots)
 
 ## G. Reflection Section
 
