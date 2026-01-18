@@ -1,4 +1,3 @@
-<img width="987" height="436" alt="image" src="https://github.com/user-attachments/assets/f1e56c75-3573-4d62-a735-8244e5842fce" />
 # Online Food Delivery Platform
 
 Java OOP + JDBC project for managing food items and special offers.
@@ -160,99 +159,7 @@ System.out.println(item2.getDescription()); // "Drink: Cola"
 
 ### UML Diagram
 
-```
-┌─────────────────────┐
-│    <<interface>>    │
-│    PricedItem       │
-├─────────────────────┤
-│ + getPrice(): double│
-└──────────┬──────────┘
-           │ implements
-           │
-┌──────────┴─────────────────────────────────┐
-│    <<interface>>                           │
-│    Validatable                             │
-├────────────────────────────────────────────┤
-│ + validate(): boolean                      │
-└────────────────────────────────────────────┘
-           ▲ implements
-           │
-┌──────────┴─────────────────────────────────┐
-│        FoodItem (abstract)                 │
-├────────────────────────────────────────────┤
-│ # id: int                                  │
-│ # name: String                             │
-│ # price: double                            │
-├────────────────────────────────────────────┤
-│ + FoodItem(id, name, price)               │
-│ + getPrice(): double                       │
-│ + validate(): boolean                      │
-│ + basicInfo(): String                      │
-│ + getId(): int                             │
-│ + getName(): String                        │
-│ + calculatePrice(): double {abstract}      │
-│ + getDescription(): String {abstract}      │
-└────────────────────────────────────────────┘
-           ▲
-           │ extends
-    ┌──────┴──────┐
-    │             │
-┌───┴────┐   ┌───┴─────┐
-│  Meal  │   │  Drink  │
-├────────┤   ├─────────┤
-│        │   │         │
-│ + calculatePrice()   │
-│ + getDescription()   │
-└────────┘   └─────────┘
-
-┌─────────────────────┐
-│       Offer         │
-├─────────────────────┤
-│ - id: int           │
-│ - foodItemId: int   │
-│ - discountPercentage│
-│ - description: String│
-│ - startDate: Date   │
-│ - endDate: Date     │
-│ - isActive: boolean │
-├─────────────────────┤
-│ + validate(): boolean│
-│ + calculateDiscountedPrice()│
-│ + isCurrentlyActive(): boolean│
-└─────────────────────┘
-           │
-           │ references (FK)
-           ▼
-    ┌──────────────┐
-    │  FoodItem    │
-    │  (via id)    │
-    └──────────────┘
-
-┌──────────────────────┐
-│  FoodItemRepository  │
-├──────────────────────┤
-│ + save(): int        │
-│ + findAll(): List    │
-│ + findById(): FoodItem│
-│ + updatePrice()      │
-│ + deleteByName()     │
-└──────────────────────┘
-
-┌──────────────────────┐
-│   OfferRepository    │
-├──────────────────────┤
-│ + save()             │
-│ + findAll(): List    │
-│ + findById(): Offer  │
-│ + findByFoodItemId() │
-│ + findActiveOffers() │
-│ + update()           │
-│ + deleteById()       │
-│ + deactivateById()   │
-└──────────────────────┘
-```
-
----
+<img width="987" height="436" alt="image" src="https://github.com/user-attachments/assets/f1e56c75-3573-4d62-a735-8244e5842fce" />
 
 ## C. Database Description
 
