@@ -52,11 +52,9 @@ public abstract class FoodItem implements PricedItem, Validatable {
     protected String name;
     protected double price;
     
-    // Abstract methods (must be implemented by subclasses)
     public abstract double calculatePrice();
     public abstract String getDescription();
     
-    // Concrete methods
     public double getPrice() { return price; }
     public boolean validate() { return price > 0 && name != null && !name.isEmpty(); }
 }
@@ -159,99 +157,7 @@ System.out.println(item2.getDescription()); // "Drink: Cola"
 
 ### UML Diagram
 
-```
-┌─────────────────────┐
-│    <<interface>>    │
-│    PricedItem       │
-├─────────────────────┤
-│ + getPrice(): double│
-└──────────┬──────────┘
-           │ implements
-           │
-┌──────────┴─────────────────────────────────┐
-│    <<interface>>                           │
-│    Validatable                             │
-├────────────────────────────────────────────┤
-│ + validate(): boolean                      │
-└────────────────────────────────────────────┘
-           ▲ implements
-           │
-┌──────────┴─────────────────────────────────┐
-│        FoodItem (abstract)                 │
-├────────────────────────────────────────────┤
-│ # id: int                                  │
-│ # name: String                             │
-│ # price: double                            │
-├────────────────────────────────────────────┤
-│ + FoodItem(id, name, price)               │
-│ + getPrice(): double                       │
-│ + validate(): boolean                      │
-│ + basicInfo(): String                      │
-│ + getId(): int                             │
-│ + getName(): String                        │
-│ + calculatePrice(): double {abstract}      │
-│ + getDescription(): String {abstract}      │
-└────────────────────────────────────────────┘
-           ▲
-           │ extends
-    ┌──────┴──────┐
-    │             │
-┌───┴────┐   ┌───┴─────┐
-│  Meal  │   │  Drink  │
-├────────┤   ├─────────┤
-│        │   │         │
-│ + calculatePrice()   │
-│ + getDescription()   │
-└────────┘   └─────────┘
-
-┌─────────────────────┐
-│       Offer         │
-├─────────────────────┤
-│ - id: int           │
-│ - foodItemId: int   │
-│ - discountPercentage│
-│ - description: String│
-│ - startDate: Date   │
-│ - endDate: Date     │
-│ - isActive: boolean │
-├─────────────────────┤
-│ + validate(): boolean│
-│ + calculateDiscountedPrice()│
-│ + isCurrentlyActive(): boolean│
-└─────────────────────┘
-           │
-           │ references (FK)
-           ▼
-    ┌──────────────┐
-    │  FoodItem    │
-    │  (via id)    │
-    └──────────────┘
-
-┌──────────────────────┐
-│  FoodItemRepository  │
-├──────────────────────┤
-│ + save(): int        │
-│ + findAll(): List    │
-│ + findById(): FoodItem│
-│ + updatePrice()      │
-│ + deleteByName()     │
-└──────────────────────┘
-
-┌──────────────────────┐
-│   OfferRepository    │
-├──────────────────────┤
-│ + save()             │
-│ + findAll(): List    │
-│ + findById(): Offer  │
-│ + findByFoodItemId() │
-│ + findActiveOffers() │
-│ + update()           │
-│ + deleteById()       │
-│ + deactivateById()   │
-└──────────────────────┘
-```
-
----
+<img width="987" height="436" alt="image" src="https://github.com/user-attachments/assets/f1e56c75-3573-4d62-a735-8244e5842fce" />
 
 ## C. Database Description
 
@@ -977,12 +883,3 @@ To demonstrate successful CRUD operations and error handling, take screenshots o
 ## Conclusion
 
 This project successfully demonstrates Object-Oriented Programming principles, JDBC database integration, and multi-layer architecture design. The separation of concerns through layers makes the application maintainable, testable, and scalable. The use of abstract classes, interfaces, and polymorphism creates a flexible design that can easily be extended with new food item types or features.
-
----
-
-## Author Information
-
-**Project**: Assignment 3 - OOP with JDBC  
-**Course**: Object-Oriented Programming  
-**Institution**: AITU (Astana IT University)  
-**Date**: 2024
