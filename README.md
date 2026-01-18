@@ -624,11 +624,8 @@ To demonstrate successful CRUD operations and error handling, take screenshots o
 ### Required Screenshots:
 
 #### 1. **Database Setup**
-- Screenshot: PostgreSQL database with both `food_items` and `offers` tables created
-- **How to capture:**
-  - Open pgAdmin or psql
-  - Run `\dt` command or expand tables in pgAdmin
-  - Take screenshot showing both tables exist
+<img width="1920" height="1019" alt="image" src="https://github.com/user-attachments/assets/4c871aad-cac7-4ef8-9759-ffb2e9142876" />
+
 
 #### 2. **CREATE Operations**
    - **2a. Adding a Meal:**
