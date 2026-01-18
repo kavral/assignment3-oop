@@ -885,12 +885,3 @@ To demonstrate successful CRUD operations and error handling, take screenshots o
 ## Conclusion
 
 This project successfully demonstrates Object-Oriented Programming principles, JDBC database integration, and multi-layer architecture design. The separation of concerns through layers makes the application maintainable, testable, and scalable. The use of abstract classes, interfaces, and polymorphism creates a flexible design that can easily be extended with new food item types or features.
-
----
-
-## Author Information
-
-**Project**: Assignment 3 - OOP with JDBC  
-**Course**: Object-Oriented Programming  
-**Institution**: AITU (Astana IT University)  
-**Date**: 2024
