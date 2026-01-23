@@ -70,6 +70,11 @@ public class OfferController {
         double discountPercentage = scanner.nextDouble();
         scanner.nextLine();
 
+        if (discountPercentage < 0 || discountPercentage > 100) {
+            System.out.println("From 0 to 100 only!");
+            return;
+        }
+
         System.out.print("Description (optional): ");
         String description = scanner.nextLine();
 
