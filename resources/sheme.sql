@@ -1,3 +1,7 @@
+--Dropping all tables
+DROP TABLE IF EXISTS food_items;
+DROP TABLE IF EXISTS offers;
+
 -- Creating a food_items table
 CREATE TABLE food_items (
     id SERIAL PRIMARY KEY,

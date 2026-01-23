@@ -17,7 +17,7 @@ public abstract class FoodItem implements PricedItem, Validatable {
 
     @Override
     public double getPrice() {
-        return price;
+            return price;
     }
 
     @Override

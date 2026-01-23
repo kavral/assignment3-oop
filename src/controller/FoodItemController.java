@@ -54,6 +54,10 @@ public class FoodItemController {
         double price = scanner.nextDouble();
         scanner.nextLine();
 
+        if (price < 0) {
+            System.out.println("Price cannot be negative");
+            return;
+        }
         FoodItem meal = new Meal(0, name, price);
         int id = service.addFoodItem(meal);
 
@@ -67,6 +71,11 @@ public class FoodItemController {
         System.out.print("Price: ");
         double price = scanner.nextDouble();
         scanner.nextLine();
+
+        if (price < 0) {
+            System.out.println("Price cannot be negative");
+            return;
+        }
 
         FoodItem drink = new Drink(0, name, price);
         int id = service.addFoodItem(drink);
@@ -90,6 +99,11 @@ public class FoodItemController {
         System.out.print("New price: ");
         double price = scanner.nextDouble();
         scanner.nextLine();
+
+        if (price < 0) {
+            System.out.println("Price cannot be negative");
+            return;
+        }
 
         service.updatePrice(name, price);
         System.out.println("Price updated.");
