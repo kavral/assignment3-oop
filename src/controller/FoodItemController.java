@@ -50,7 +50,7 @@ public class FoodItemController {
         System.out.print("Meal name: ");
         String name = scanner.nextLine();
 
-        if (name == null) {
+        if (name == null || name == "") {
             System.out.println("Name can not be empty");
             return;
         }
@@ -73,7 +73,7 @@ public class FoodItemController {
         System.out.print("Drink name: ");
         String name = scanner.nextLine();
 
-        if (name == null) {
+        if (name == null || name == "") {
             System.out.println("Name can not be empty");
             return;
         }
