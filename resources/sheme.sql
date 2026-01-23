@@ -1,6 +1,6 @@
 --Dropping all tables
-DROP TABLE IF EXISTS food_items;
 DROP TABLE IF EXISTS offers;
+DROP TABLE IF EXISTS food_items;
 
 -- Creating a food_items table
 CREATE TABLE food_items (
