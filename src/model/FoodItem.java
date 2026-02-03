@@ -2,9 +2,9 @@ package model;
 
 public abstract class FoodItem implements PricedItem, Validatable {
 
-    protected int id;
-    protected String name;
-    protected double price;
+    private int id;
+    private String name;
+    private double price;
 
     public FoodItem(int id, String name, double price) {
         this.id = id;
@@ -13,11 +13,16 @@ public abstract class FoodItem implements PricedItem, Validatable {
     }
 
     public abstract double calculatePrice();
+
     public abstract String getDescription();
 
     @Override
     public double getPrice() {
-            return price;
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     @Override
@@ -26,14 +31,22 @@ public abstract class FoodItem implements PricedItem, Validatable {
     }
 
     public String basicInfo() {
-        return name + " - $" + price;
+        return name + " - " + getFormattedPrice();
     }
 
     public int getId() {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

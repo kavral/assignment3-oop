@@ -1,45 +1,22 @@
 package service;
 
 import model.FoodItem;
-import repository.FoodItemRepository;
 
 import java.util.List;
 
-public class FoodItemService {
+public interface FoodItemService {
 
-    private final FoodItemRepository repository = new FoodItemRepository();
+    FoodItem addFoodItem(FoodItem item);
 
-    public int addFoodItem(FoodItem item) {
-        item.validate();
-        return repository.save(item);
-    }
+    List<FoodItem> getAllFoodItems();
 
-    public List<FoodItem> getAllFoodItems() {
-        return repository.findAll();
-    }
+    List<FoodItem> getAllFoodItemsSortedByName();
 
-    public void updatePrice(String name, double price) {
-        if (price <= 0) {
-            throw new RuntimeException("Price must be positive");
-        }
-        repository.updatePrice(name, price);
-    }
+    void updatePrice(String name, double price);
 
-    public void deleteFoodItem(String name) {
-        if (name == null || name.isBlank()) {
-            throw new RuntimeException("Name cannot be empty");
-        }
-        repository.deleteByName(name);
-    }
+    void deleteFoodItem(String name);
 
-    public FoodItem getFoodItemById(int id) {
-        if (id <= 0) {
-            throw new RuntimeException("ID must be positive");
-        }
-        FoodItem item = repository.findById(id);
-        if (item == null) {
-            throw new RuntimeException("Food item not found with ID: " + id);
-        }
-        return item;
-    }
+    void deleteFoodItemById(int id);
+
+    FoodItem getFoodItemById(int id);
 }

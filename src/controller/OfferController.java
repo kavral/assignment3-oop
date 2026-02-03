@@ -12,10 +12,15 @@ import java.util.Scanner;
 
 public class OfferController {
 
-    private final OfferService offerService = new OfferService();
-    private final FoodItemService foodItemService = new FoodItemService();
+    private final OfferService offerService;
+    private final FoodItemService foodItemService;
     private final Scanner scanner = new Scanner(System.in);
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    public OfferController(OfferService offerService, FoodItemService foodItemService) {
+        this.offerService = offerService;
+        this.foodItemService = foodItemService;
+    }
 
     public void start() {
         boolean running = true;
@@ -33,7 +38,7 @@ public class OfferController {
             System.out.print("Choose: ");
 
             int choice = scanner.nextInt();
-            scanner.nextLine(); // consume newline
+            scanner.nextLine();
 
             try {
                 switch (choice) {
@@ -55,13 +60,12 @@ public class OfferController {
 
     private void addOffer() {
         System.out.println("\n--- Add New Offer ---");
-        
-        // Show available food items
+
         System.out.println("\nAvailable Food Items:");
-        foodItemService.getAllFoodItems().forEach(item -> 
-            System.out.println("ID: " + item.getId() + " - " + item.getName() + " - $" + item.getPrice())
+        foodItemService.getAllFoodItems().forEach(item ->
+                System.out.println("ID: " + item.getId() + " - " + item.getName() + " - " + item.getFormattedPrice())
         );
-        
+
         System.out.print("Food Item ID: ");
         int foodItemId = scanner.nextInt();
         scanner.nextLine();
@@ -93,7 +97,7 @@ public class OfferController {
 
     private void viewAllOffers() {
         List<Offer> offers = offerService.getAllOffers();
-        
+
         System.out.println("\n--- All Offers ---");
         if (offers.isEmpty()) {
             System.out.println("No offers found.");
@@ -107,13 +111,13 @@ public class OfferController {
 
     private void viewActiveOffers() {
         List<Offer> offers = offerService.getActiveOffers();
-        
+
         System.out.println("\n--- Active Offers ---");
         if (offers.isEmpty()) {
             System.out.println("No active offers found.");
         } else {
-            offers.forEach(offer -> 
-                System.out.println(offer.toString())
+            offers.forEach(offer ->
+                    System.out.println(offer.toString())
             );
         }
     }
@@ -124,13 +128,13 @@ public class OfferController {
         scanner.nextLine();
 
         List<Offer> offers = offerService.getOffersByFoodItemId(foodItemId);
-        
+
         System.out.println("\n--- Offers for Food Item ID " + foodItemId + " ---");
         if (offers.isEmpty()) {
             System.out.println("No offers found for this food item.");
         } else {
-            offers.forEach(offer -> 
-                System.out.println(offer.toString())
+            offers.forEach(offer ->
+                    System.out.println(offer.toString())
             );
         }
     }
@@ -141,7 +145,7 @@ public class OfferController {
         scanner.nextLine();
 
         Offer offer = offerService.getOfferById(id);
-        
+
         System.out.println("Current offer: " + offer.toString());
         System.out.println("\nEnter new values (press Enter to keep current value):");
 
@@ -195,7 +199,7 @@ public class OfferController {
 
         System.out.print("Are you sure you want to delete this offer? (yes/no): ");
         String confirmation = scanner.nextLine();
-        
+
         if ("yes".equalsIgnoreCase(confirmation)) {
             offerService.deleteOffer(id);
             System.out.println("Offer deleted successfully!");
