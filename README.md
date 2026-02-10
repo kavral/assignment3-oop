@@ -1,176 +1,221 @@
-# Assignment 3 OOP — Food Delivery Platform
+## Endterm Project API — Spring Boot, Design Patterns & Component Principles
 
-Console application for managing food items (Meals, Drinks) and offers. Built with SOLID architecture, JDBC (PostgreSQL), and advanced OOP features.
-
----
-
-## A. SOLID Documentation
-
-### SRP (Single Responsibility Principle) — one reason to change per class
-
-| Class / Layer | Responsibility |
-|---------------|----------------|
-| **FoodItemController** | Handle user input and output for food items only. |
-| **OfferController** | Handle user input and output for offers only. |
-| **FoodItemServiceImpl** | Business rules and validation for food items. |
-| **OfferServiceImpl** | Business rules and validation for offers. |
-| **FoodItemRepositoryImpl** | JDBC data access for `food_items` table only. |
-| **OfferRepositoryImpl** | JDBC data access for `offers` table only. |
-| **FoodItem** (abstract) | Represent a generic food item; subclasses define behavior. |
-| **ReflectionUtil** | Inspect object structure via reflection only. |
-
-### OCP (Open–Closed Principle) — open for extension, closed for modification
-
-- **FoodItem** is an abstract base class. New kinds of items (e.g. `Dessert`) are added by creating a new subclass and implementing `calculatePrice()` and `getDescription()` **without changing** existing `Meal`/`Drink` or repository logic.
-- New repository or service behavior can be added via new interfaces/implementations without changing existing controllers.
-
-### LSP (Liskov Substitution Principle) — subclasses substitutable for base type
-
-- **Meal** and **Drink** extend **FoodItem**. Any code that works with `FoodItem` (e.g. `List<FoodItem>`, service/repository) works correctly when given a `Meal` or `Drink`.
-- They override only abstract methods and do not strengthen preconditions or weaken postconditions.
-
-### ISP (Interface Segregation Principle) — narrow interfaces
-
-- **Validatable** — only `validate()` (and optional default/static helpers).
-- **PricedItem** — extends `Validatable` and adds `getPrice()` (and optional `getFormattedPrice()`).
-- **FoodItemService** / **OfferService** — only the operations needed by controllers.
-- **CrudRepository\<T\>** — generic CRUD; **FoodItemRepository** adds food-specific methods (e.g. `findAllSortedByName`, `updatePrice`, `deleteByName`).
-
-### DIP (Dependency Inversion Principle) — depend on abstractions
-
-- **Controllers** depend on **service interfaces** (`FoodItemService`, `OfferService`), not concrete classes. Implementations are injected via constructor in `Main`.
-- **Services** depend on **repository interfaces** (`FoodItemRepository`, `OfferRepository`), not JDBC implementations. Implementations are injected via constructor.
-- **Main** is the composition root: it creates concrete repositories and services and passes them into controllers.
+This project is the evolution of the Assignment 3 console app into a **Spring Boot RESTful API** with **JDBC**, **creational design patterns**, and **Component Principles**.
 
 ---
 
-## B. Advanced OOP Features
+### A. Project Overview
 
-### Generics
-
-- **CrudRepository\<T\>**: `save(T entity)`, `findById(int id)`, `findAll()`, `deleteById(int id)`. Type-safe reuse for any entity (e.g. `FoodItemRepository extends CrudRepository<FoodItem>`).
-- **List\<FoodItem\>**, **List\<Offer\>** used in service/controller return types.
-
-### Lambdas
-
-- **Sorting**: In `FoodItemRepositoryImpl.findAllSortedByName()` — `items.sort(Comparator.comparing(FoodItem::getName, String.CASE_INSENSITIVE_ORDER));` (method reference + comparator).
-- **Iteration**: In controllers — `items.forEach(item -> System.out.println(...))`.
-
-### Reflection
-
-- **ReflectionUtil** (`utils/ReflectionUtil.java`): `describe(Object obj)` uses `Class.getDeclaredFields()`, `getMethods()`, `Field.get(obj)` to print class name, fields (with values), and public methods. Used in **Food Items → option 8 (Reflection Demo)**.
-
-### Interface default / static methods
-
-- **Validatable**: `default String validationMessage()` and `static boolean isValid(Validatable v)`.
-- **PricedItem**: `default String getFormattedPrice()`.
+- Domain:
+  - `FoodItem` (abstract) with `Meal` and `Drink` subclasses.
+  - `Offer` linked to `FoodItem` through `food_item_id`.
+- Architecture:
+  - `controller` — REST controllers.
+  - `service` — business logic and validation.
+  - `repository` — JDBC data access (PostgreSQL).
+  - `model` — domain entities and interfaces.
+  - `dto` — request/response models for REST.
+  - `patterns` — Singleton, Factory, Builder implementations.
+  - `utils`, `config`, `logging` — shared infrastructure.
 
 ---
 
-## C. OOP Documentation
+### B. REST API Documentation
 
-### Abstract class and subclasses
+**Base URL**: `http://localhost:8080/api`
 
-- **FoodItem** (abstract): fields `id`, `name`, `price` (private; getters/setters). Abstract: `calculatePrice()`, `getDescription()`. Concrete: `getPrice()`, `validate()`, `basicInfo()`.
-- **Meal** extends **FoodItem**: adds optional `calories`; overrides `calculatePrice()`, `getDescription()`.
-- **Drink** extends **FoodItem**: adds optional `volumeMl`; overrides `calculatePrice()`, `getDescription()`.
+#### Food Items
 
-### Composition / aggregation
+- **GET** `/food-items` — list all food items.
+- **GET** `/food-items/{id}` — get a single food item by id.
+- **POST** `/food-items` — create a new food item.
 
-- **Offer** has a **food_item_id** (FK to `food_items`). Conceptually: Offer aggregates a reference to a FoodItem (composition/aggregation). No inheritance between Offer and FoodItem.
+  Request body:
 
-### Polymorphism
+  ```json
+  {
+    "name": "Burger Combo",
+    "price": 9.99,
+    "type": "MEAL"
+  }
+  ```
 
-- Repository returns `List<FoodItem>`; list can contain `Meal` and `Drink`. Code uses `item.getDescription()` and `item.calculatePrice()` — behavior depends on runtime type.
-- Controllers and services work with `FoodItem`; they don’t need to know concrete type for display or persistence (type stored in DB as `Meal`/`Drink`).
+  Response body:
 
-### UML (high-level)
+  ```json
+  {
+    "id": 1,
+    "name": "Burger Combo",
+    "price": 9.99,
+    "description": "Meal: Burger Combo"
+  }
+  ```
 
+- **PUT** `/food-items/{id}/price?price=12.50` — update price of an item.
+- **DELETE** `/food-items/{id}` — delete an item by id.
+
+#### Offers
+
+- **GET** `/offers` — list all offers.
+- **GET** `/offers/active` — list currently active offers.
+- **GET** `/offers/{id}` — get offer by id.
+- **GET** `/offers/by-food/{foodItemId}` — offers for a given food item.
+
+- **POST** `/offers` — create a new offer.
+
+  Request body:
+
+  ```json
+  {
+    "foodItemId": 1,
+    "discountPercentage": 20,
+    "description": "20% off combo",
+    "startDate": "2025-01-01",
+    "endDate": "2025-01-31"
+  }
+  ```
+
+- **PUT** `/offers/{id}` — update an existing offer.
+- **POST** `/offers/{id}/deactivate` — deactivate an offer.
+- **DELETE** `/offers/{id}` — delete an offer.
+
+#### Error responses
+
+All errors go through `GlobalExceptionHandler` and return JSON:
+
+```json
+{
+  "timestamp": "2025-01-01T12:00:00",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Food item ID must be positive"
+}
 ```
-                    <<interface>>
-                    Validatable
-                    + validate(): boolean
-                           ^
-                    PricedItem (extends Validatable)
-                    + getPrice(): double
-                           ^
-                    FoodItem (abstract, implements PricedItem)
-                    - id, name, price
-                    + calculatePrice(): double (abstract)
-                    + getDescription(): String (abstract)
-                    + basicInfo(): String
-                    + validate(): boolean
-                    / getPrice(), getters/setters
-                    ^           ^
-              Meal              Drink
-              - calories         - volumeMl
 
-    Controller --> Service (interface)
-    Service --> Repository (interface)
-    Offer --> food_item_id (FK to FoodItem)
+You can test with **Postman** or **curl**:
+
+```bash
+curl http://localhost:8080/api/food-items
 ```
 
 ---
 
-## D. Database Section
+### C. Design Patterns
 
-### Schema
+- **Singleton**
+  - `config.DatabaseConfigManager` — single shared source of DB configuration, used by `utils.DatabaseConnection`.
+  - `logging.LoggerService` — simple global logger used in controllers and exception handler.
 
-- **food_items**: `id` (SERIAL PK), `name` (VARCHAR NOT NULL), `price` (DECIMAL NOT NULL, CHECK &gt; 0), `type` (VARCHAR NOT NULL, CHECK IN ('Meal','Drink')).
-- **offers**: `id` (SERIAL PK), `food_item_id` (INT NOT NULL, FK → food_items.id ON DELETE CASCADE), `discount_percentage` (DECIMAL, CHECK 0–100), `description`, `start_date`, `end_date` (NOT NULL), `is_active` (DEFAULT TRUE), CHECK `end_date >= start_date`.
+- **Factory**
+  - `patterns.factory.FoodItemFactory` — creates `Meal` or `Drink` based on `FoodItemRequest.type`. Returns base type `FoodItem` and is easily extendable (e.g. add `Dessert`).
 
-### Constraints
-
-- PKs on `food_items.id` and `offers.id`.
-- FK `offers.food_item_id` → `food_items(id)` ON DELETE CASCADE.
-- CHECKs: `price > 0`, `type IN ('Meal','Drink')`, `discount_percentage` in (0, 100], `end_date >= start_date`.
-
-### Sample inserts
-
-See `resources/sheme.sql`: sample rows for `food_items` (e.g. Burger, Pizza, Cola) and `offers` (e.g. 10% off Burger, 15% off Pizza).
+- **Builder**
+  - `patterns.builder.OfferBuilder` — builds complex `Offer` instances with fluent setters and optional fields. `OfferRestController` uses it both for creating new offers and updating existing ones (`fromExisting`).
 
 ---
 
-## E. Architecture Explanation
+### D. Component Principles (REP, CCP, CRP)
 
-- **Controller**: Reads user input (Scanner), calls service methods, prints results. Catches runtime exceptions and shows messages. No SQL or direct repository access.
-- **Service**: Validates input and business rules, calls repository. Throws `ValidationException` / `FoodItemNotValidException` on invalid data or missing entities.
-- **Repository**: Executes JDBC (using `DatabaseConnection`), maps `ResultSet` to entities. No business rules.
+- **REP** — Reuse/Release Equivalence
+  - Reusable modules grouped into components: `repository`, `service`, `patterns`, `utils`, `logging`, `config`.
 
-Example flow: **Add Meal**  
-User enters name and price → Controller creates `Meal(0, name, price)` → Controller calls `foodItemService.addFoodItem(meal)` → Service validates (e.g. `Validatable.isValid(item)`), calls `repository.save(item)` → Repository INSERTs and sets ID on entity, returns it → Service returns entity → Controller prints "Meal added with ID: …".
+- **CCP** — Common Closure Principle
+  - Classes that change together are packaged together:
+    - REST contracts in `controller` + `dto`.
+    - Business rules in `service`.
+    - JDBC code in `repository`.
+    - Cross-cutting infra in `config` and `logging`.
 
----
-
-## F. Execution Instructions
-
-### Requirements
-
-- **Java**: 17+ (or 11+; project uses standard JDBC and `java.time`).
-- **PostgreSQL**: Server running; database `food_delivery` created.
-- **Driver**: PostgreSQL JDBC driver on classpath (e.g. in IDE libraries or Maven/Gradle).
-
-### Database setup
-
-1. Create database: `CREATE DATABASE food_delivery;`
-2. Run `resources/sheme.sql` in your SQL client (creates tables, constraints, sample data).
-3. In `utils/DatabaseConnection.java`, set `URL`, `USER`, `PASSWORD` to your environment (or use config/env later).
-
-### Compile and run
-
-- **IDE**: Open project, set JDBC driver, run `Main.main()`.
-- **Command line**:  
-  `javac -cp ".;path/to/postgresql.jar" src/**/*.java` (adjust path and package roots).  
-  `java -cp ".;path/to/postgresql.jar" Main` (from `src` or with correct package path).
+- **CRP** — Common Reuse Principle
+  - API clients only depend on `dto` and controller endpoints, not on repository/DB details.
+  - Modules can reuse `patterns` or `utils` without pulling UI code.
 
 ---
 
-## G. Screenshots
+### E. SOLID & OOP Summary
+
+- **SRP**: Each package and class has a single responsibility (controllers = HTTP, services = rules, repos = DB).
+- **OCP**: New `FoodItem` types or offer behaviors can be added with new subclasses/factory/ builder logic without modifying existing controllers.
+- **LSP**: `Meal` and `Drink` are valid substitutes wherever `FoodItem` is used.
+- **ISP**: Service and repository interfaces are focused on what their clients need.
+- **DIP**: Controllers depend on service interfaces, services depend on repository interfaces, Spring injects implementations.
 
 ---
 
-## H. Reflection (Learning & Challenges)
+### F. Database Schema
 
-- **What you learned**: Separating UI, business logic, and data access makes the code easier to test and change. Depending on interfaces (DIP) allows swapping implementations. Abstract base class + subclasses (OCP/LSP) keep the model clear and extensible.
-- **Challenges**: Wiring dependencies manually in `Main`; ensuring repository returns entities with IDs set; handling validation consistently across controller and service.
-- **Value of SOLID**: Changes in one layer (e.g. new validation rule in service or new sort in repository) don’t force changes in others. New food types or new repositories can be added with minimal edits to existing code.
+- `food_items`:
+  - `id` SERIAL PK
+  - `name` VARCHAR NOT NULL
+  - `price` DECIMAL NOT NULL
+  - `type` VARCHAR NOT NULL (`Meal` or `Drink`)
+- `offers`:
+  - `id` SERIAL PK
+  - `food_item_id` INT FK → `food_items(id)`
+  - `discount_percentage` DECIMAL
+  - `description` VARCHAR
+  - `start_date`, `end_date` DATE
+  - `is_active` BOOLEAN
+
+The original SQL is in `resources/sheme.sql`; you can reuse it for the Spring Boot DB.
+
+---
+
+### G. System Architecture Diagram (Text)
+
+- **Controller**
+  - `FoodItemRestController`
+  - `OfferRestController`
+- **Service**
+  - `FoodItemService` / `FoodItemServiceImpl`
+  - `OfferService` / `OfferServiceImpl`
+- **Repository**
+  - `FoodItemRepository` / `FoodItemRepositoryImpl`
+  - `OfferRepository` / `OfferRepositoryImpl`
+- **Domain**
+  - `FoodItem` (abstract) → `Meal`, `Drink`
+  - `Offer`
+- **Patterns / Infra**
+  - `config.DatabaseConfigManager` (Singleton)
+  - `logging.LoggerService` (Singleton)
+  - `patterns.factory.FoodItemFactory`
+  - `patterns.builder.OfferBuilder`
+  - `utils.DatabaseConnection`
+
+For your UML diagram, you can export a class diagram as `docs/uml.png`.
+
+---
+
+### H. How to Run the Spring Boot Application
+
+1. **Prerequisites**
+   - Java 17+
+   - Maven
+   - PostgreSQL database `food_delivery`
+
+2. **Configure DB**
+   - Update `src/main/resources/application.properties`:
+     - `spring.datasource.url`
+     - `spring.datasource.username`
+     - `spring.datasource.password`
+   - Run `resources/sheme.sql` to create tables and seed data.
+
+3. **Build & Run**
+
+   ```bash
+   mvn clean package
+   mvn spring-boot:run
+   ```
+
+4. **Test**
+   - Use Postman / curl against `http://localhost:8080/api/...`.
+
+---
+
+### I. Reflection
+
+- Migrating from console + JDBC to Spring Boot required separating external API (controllers + DTOs) from the internal domain and infrastructure.
+- Implementing Singleton, Factory, and Builder patterns inside the REST architecture shows how classical patterns still matter even when using a framework.
+- Component principles helped structure packages so that changes in one area (REST, DB, patterns) have minimal impact on others.
+- The final system demonstrates full integration of **JDBC**, **SOLID**, **design patterns**, **component principles**, and a **RESTful API**.
+
