@@ -99,7 +99,6 @@ public class OfferRepositoryImpl implements OfferRepository {
         }
         return offers;
     }
-
     @Override
     public Offer findById(int id) {
         String sql = "SELECT * FROM offers WHERE id = ?";
