@@ -1,14 +1,6 @@
--- =============================================
--- Food Delivery DB Schema (Assignment 3 OOP)
--- =============================================
-
--- Drop tables (order matters due to FK)
 DROP TABLE IF EXISTS offers;
 DROP TABLE IF EXISTS food_items;
 
--- ---------------------------------------------
--- food_items: base entity storage (Meal/Drink)
--- ---------------------------------------------
 CREATE TABLE food_items (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -16,9 +8,6 @@ CREATE TABLE food_items (
     type VARCHAR(50) NOT NULL CHECK (type IN ('Meal', 'Drink'))
 );
 
--- ---------------------------------------------
--- offers: aggregation to food_items (FK)
--- ---------------------------------------------
 CREATE TABLE offers (
     id SERIAL PRIMARY KEY,
     food_item_id INT NOT NULL,
@@ -31,9 +20,6 @@ CREATE TABLE offers (
     CONSTRAINT chk_offer_dates CHECK (end_date >= start_date)
 );
 
--- ---------------------------------------------
--- Sample INSERT statements
--- ---------------------------------------------
 INSERT INTO food_items (name, price, type) VALUES
     ('Burger', 8.99, 'Meal'),
     ('Pizza Margherita', 12.50, 'Meal'),
