@@ -4,9 +4,6 @@ import model.Offer;
 
 import java.time.LocalDate;
 
-/**
- * Builder for constructing Offer objects with fluent API.
- */
 public class OfferBuilder {
 
     private int id;

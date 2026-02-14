@@ -3,12 +3,6 @@ package logging;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Simple logging service implemented as a Singleton.
- *
- * In a real project you would typically use SLF4J/Logback, but this class
- * exists to make the Singleton pattern explicit for documentation and UML.
- */
 public final class LoggerService {
 
     private static final DateTimeFormatter FORMATTER =

@@ -1,5 +1,7 @@
 package service;
 
+import cache.CacheKeys;
+import cache.InMemoryCacheManager;
 import exception.FoodItemNotValidException;
 import model.FoodItem;
 import model.Validatable;
@@ -12,6 +14,7 @@ import java.util.List;
 public class FoodItemServiceImpl implements FoodItemService {
 
     private final FoodItemRepository repository;
+    private final InMemoryCacheManager cache = InMemoryCacheManager.getInstance();
 
     public FoodItemServiceImpl(FoodItemRepository repository) {
         this.repository = repository;
@@ -23,12 +26,24 @@ public class FoodItemServiceImpl implements FoodItemService {
             throw new FoodItemNotValidException("Invalid food item: " + item.validationMessage());
         }
         FoodItem saved = repository.save(item);
+        invalidateFoodItemsCache();
         return saved != null ? saved : null;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<FoodItem> getAllFoodItems() {
-        return repository.findAll();
+        List<FoodItem> cached = (List<FoodItem>) cache.get(CacheKeys.FOOD_ITEMS_ALL);
+        if (cached != null) {
+            return cached;
+        }
+        List<FoodItem> list = repository.findAll();
+        cache.put(CacheKeys.FOOD_ITEMS_ALL, list);
+        return list;
+    }
+
+    private void invalidateFoodItemsCache() {
+        cache.remove(CacheKeys.FOOD_ITEMS_ALL);
     }
 
     @Override
@@ -42,6 +57,7 @@ public class FoodItemServiceImpl implements FoodItemService {
             throw new FoodItemNotValidException("Price must be positive");
         }
         repository.updatePrice(name, price);
+        invalidateFoodItemsCache();
     }
 
     @Override
@@ -50,6 +66,7 @@ public class FoodItemServiceImpl implements FoodItemService {
             throw new FoodItemNotValidException("Name cannot be empty");
         }
         repository.deleteByName(name);
+        invalidateFoodItemsCache();
     }
 
     @Override
@@ -58,6 +75,7 @@ public class FoodItemServiceImpl implements FoodItemService {
             throw new FoodItemNotValidException("ID must be positive");
         }
         repository.deleteById(id);
+        invalidateFoodItemsCache();
     }
 
     @Override

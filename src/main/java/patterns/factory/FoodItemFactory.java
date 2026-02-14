@@ -6,9 +6,6 @@ import model.Drink;
 import model.FoodItem;
 import model.Meal;
 
-/**
- * Factory for creating FoodItem subclasses based on DTO input.
- */
 public class FoodItemFactory {
 
     private final LoggerService logger = LoggerService.getInstance();

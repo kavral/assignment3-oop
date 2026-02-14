@@ -19,7 +19,8 @@ import org.springframework.context.annotation.ComponentScan;
         "patterns",
         "utils",
         "config",
-        "logging"
+        "logging",
+        "cache"
 })
 public class Application {
 

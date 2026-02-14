@@ -3,11 +3,6 @@ package config;
 import java.util.Objects;
 import java.util.Properties;
 
-/**
- * Singleton responsible for application-wide database configuration.
- *
- * Used by JDBC utility code to avoid hard-coded URLs and credentials.
- */
 public final class DatabaseConfigManager {
 
     private static volatile DatabaseConfigManager instance;

@@ -10,11 +10,12 @@ This project is the evolution of the Assignment 3 console app into a **Spring Bo
   - `FoodItem` (abstract) with `Meal` and `Drink` subclasses.
   - `Offer` linked to `FoodItem` through `food_item_id`.
 - Architecture:
-  - `controller` — REST controllers.
-  - `service` — business logic and validation.
+  - `controller` — REST controllers (including cache clear endpoint).
+  - `service` — business logic, validation, and cache integration for `getAllFoodItems()`.
   - `repository` — JDBC data access (PostgreSQL).
   - `model` — domain entities and interfaces.
   - `dto` — request/response models for REST.
+  - `cache` — in-memory cache (Singleton) and cache keys.
   - `patterns` — Singleton, Factory, Builder implementations.
   - `utils`, `config`, `logging` — shared infrastructure.
 
@@ -53,6 +54,11 @@ This project is the evolution of the Assignment 3 console app into a **Spring Bo
 
 - **PUT** `/food-items/{id}/price?price=12.50` — update price of an item.
 - **DELETE** `/food-items/{id}` — delete an item by id.
+
+#### Cache (manual clear)
+
+- **DELETE** `/api/cache` — clear the entire in-memory cache (manual invalidation).
+- **POST** `/api/cache/clear` — same as above (alternative for clients that prefer POST).
 
 #### Offers
 
@@ -105,6 +111,7 @@ curl http://localhost:8080/api/food-items
 - **Singleton**
   - `config.DatabaseConfigManager` — single shared source of DB configuration, used by `utils.DatabaseConnection`.
   - `logging.LoggerService` — simple global logger used in controllers and exception handler.
+  - `cache.InMemoryCacheManager` — single shared in-memory cache instance; see **Caching Layer** below.
 
 - **Factory**
   - `patterns.factory.FoodItemFactory` — creates `Meal` or `Drink` based on `FoodItemRequest.type`. Returns base type `FoodItem` and is easily extendable (e.g. add `Dessert`).
@@ -178,11 +185,46 @@ The original SQL is in `resources/sheme.sql`; you can reuse it for the Spring Bo
 - **Patterns / Infra**
   - `config.DatabaseConfigManager` (Singleton)
   - `logging.LoggerService` (Singleton)
+  - `cache.InMemoryCacheManager` (Singleton), `cache.SimpleCache`, `cache.CacheKeys`
   - `patterns.factory.FoodItemFactory`
   - `patterns.builder.OfferBuilder`
   - `utils.DatabaseConnection`
+- **Cache**
+  - `controller.CacheController` — manual cache clear via `DELETE /api/cache` or `POST /api/cache/clear`.
 
 For your UML diagram, you can export a class diagram as `docs/uml.png`.
+
+---
+
+### J. Caching Layer (In-Memory Cache)
+
+A simple in-memory cache is used to avoid repeated database queries for frequently requested data.
+
+#### What was implemented
+
+1. **Singleton cache instance**
+   - `cache.InMemoryCacheManager` is a **Singleton**: one shared instance across the application (`getInstance()` with double-checked locking).
+   - Storage is a single in-memory `ConcurrentHashMap` (thread-safe for concurrent REST requests).
+
+2. **Cached method**
+   - **`getAllFoodItems()`** is cached. The first call loads the list from the database and stores it under the key `CacheKeys.FOOD_ITEMS_ALL`. Subsequent calls return the cached list without hitting the database.
+
+3. **Automatic invalidation**
+   - The cache for food items is cleared whenever data changes so that clients never get stale data:
+     - After **add** (addFoodItem): cache is invalidated.
+     - After **update** (updatePrice): cache is invalidated.
+     - After **delete** (deleteFoodItem or deleteFoodItemById): cache is invalidated.
+   - Invalidation is done by removing the key `CacheKeys.FOOD_ITEMS_ALL` in `FoodItemServiceImpl` (private method `invalidateFoodItemsCache()`).
+
+4. **Manual clear**
+   - **DELETE** `/api/cache` or **POST** `/api/cache/clear` clears the entire cache. Use this after bulk updates or when you want to force fresh data from the database.
+
+#### Design (SOLID and layers)
+
+- **Interface** `cache.SimpleCache` defines `get`, `put`, `remove`, `clear`. The service layer depends on the cache abstraction (DIP). `InMemoryCacheManager` implements this interface.
+- **Single responsibility**: the cache only stores and retrieves data; the service decides *what* to cache and *when* to invalidate.
+- **Layered architecture**: the cache is used only inside the **service** layer (`FoodItemServiceImpl`). Controllers do not access the cache for business data; they only expose a cache-clear endpoint that delegates to the Singleton. The repository layer is unchanged and has no cache awareness.
+- **Cache keys** are centralized in `cache.CacheKeys` to avoid magic strings and keep key management in one place.
 
 ---
 
@@ -217,5 +259,5 @@ For your UML diagram, you can export a class diagram as `docs/uml.png`.
 - Migrating from console + JDBC to Spring Boot required separating external API (controllers + DTOs) from the internal domain and infrastructure.
 - Implementing Singleton, Factory, and Builder patterns inside the REST architecture shows how classical patterns still matter even when using a framework.
 - Component principles helped structure packages so that changes in one area (REST, DB, patterns) have minimal impact on others.
-- The final system demonstrates full integration of **JDBC**, **SOLID**, **design patterns**, **component principles**, and a **RESTful API**.
+- The final system demonstrates full integration of **JDBC**, **SOLID**, **design patterns**, **component principles**, and a **RESTful API**. An **in-memory caching layer** (Singleton) caches `getAllFoodItems()` and invalidates on updates/deletes, with a manual clear endpoint, without breaking the layered architecture.
 
